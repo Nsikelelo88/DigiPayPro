@@ -1,0 +1,67 @@
+﻿@model DigitalPayPro.ViewModels.LeaveRequestViewModel
+
+@{
+    ViewData["Title"] = "Create Leave Request";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+        {
+            <label asp-for="EmployeeId" class="control-label">Employee</label>
+            <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.Employees">
+                <option value="">-- Select Employee --</option>
+            </select>
+            <span asp-validation-for="EmployeeId" class="text-danger"></span>
+        }
+        else
+        {
+            <input type="hidden" asp-for="EmployeeId" />
+            <div class="form-control-plaintext">@Model.EmployeeName</div>
+        }
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LeaveType" class="control-label"></label>
+        <select asp-for="LeaveType" class="form-control">
+            <option value="">-- Select Leave Type --</option>
+            <option value="Annual">Annual Leave</option>
+            <option value="Sick">Sick Leave</option>
+            <option value="Unpaid">Unpaid Leave</option>
+        </select>
+        <span asp-validation-for="LeaveType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="StartDate" class="control-label"></label>
+        <input asp-for="StartDate" class="form-control" type="date" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="EndDate" class="control-label"></label>
+        <input asp-for="EndDate" class="form-control" type="date" />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Reason" class="control-label"></label>
+        <textarea asp-for="Reason" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Reason" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Leave Request</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

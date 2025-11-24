@@ -1,0 +1,21 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.table th {
+    background-color: #f8f9fa;
+}
+
+.btn-group .btn {
+    margin-right: 5px;
+}
+
+.footer {
+    background-color: #f8f9fa;
+    padding: 20px 0;
+}

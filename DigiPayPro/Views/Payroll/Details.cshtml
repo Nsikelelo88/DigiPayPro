@@ -1,0 +1,186 @@
+﻿@model DigitalPayPro.Models.PayrollRecord
+
+@{
+    ViewData["Title"] = "Payroll Details";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>
+                        Payroll Details
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Employee Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>Employee Information</h5>
+                            <hr>
+                            <dl class="row">
+                                <dt class="col-sm-4">Employee Name:</dt>
+                                <dd class="col-sm-8">@Model.Employee.FirstName @Model.Employee.LastName</dd>
+
+                                <dt class="col-sm-4">ID Number:</dt>
+                                <dd class="col-sm-8">@Model.Employee.IDNumber</dd>
+
+                                <dt class="col-sm-4">Position:</dt>
+                                <dd class="col-sm-8">@Model.Employee.Position</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Payroll Information</h5>
+                            <hr>
+                            <dl class="row">
+                                <dt class="col-sm-4">Pay Period:</dt>
+                                <dd class="col-sm-8">@Model.PayPeriod.ToString("MMMM yyyy")</dd>
+
+                                <dt class="col-sm-4">Date Processed:</dt>
+                                <dd class="col-sm-8">@Model.DateProcessed.ToString("dd MMMM yyyy")</dd>
+
+                                <dt class="col-sm-4">Net Pay:</dt>
+                                <dd class="col-sm-8">R @Model.NetPay.ToString("N2")</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Earnings -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>Earnings</h5>
+                            <hr>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Description</th>
+                                            <th class="text-end">Amount (R)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Basic Pay</td>
+                                            <td class="text-end">@Model.BasicPay.ToString("N2")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Overtime Pay (@Model.OvertimeHours hours)</td>
+                                            <td class="text-end">@Model.OvertimePay.ToString("N2")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Incentives/Bonus</td>
+                                            <td class="text-end">@Model.Incentives.ToString("N2")</td>
+                                        </tr>
+                                        <tr class="table-success">
+                                            <td><strong>Gross Pay</strong></td>
+                                            <td class="text-end"><strong>@Model.GrossPay.ToString("N2")</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deductions -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>Deductions</h5>
+                            <hr>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Description</th>
+                                            <th class="text-end">Amount (R)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>PAYE (Tax)</td>
+                                            <td class="text-end">@Model.PAYE.ToString("N2")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>UIF</td>
+                                            <td class="text-end">@Model.UIF.ToString("N2")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pension Fund</td>
+                                            <td class="text-end">@Model.Pension.ToString("N2")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Medical Aid</td>
+                                            <td class="text-end">@Model.MedicalAid.ToString("N2")</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Other Deductions</td>
+                                            <td class="text-end">@Model.OtherDeductions.ToString("N2")</td>
+                                        </tr>
+                                        <tr class="table-danger">
+                                            <td><strong>Total Deductions</strong></td>
+                                            <td class="text-end"><strong>@Model.TotalDeductions.ToString("N2")</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h4 class="card-title">Net Pay: R @Model.NetPay.ToString("N2")</h4>
+                                    <p class="card-text">
+                                        Gross Pay: R @Model.GrossPay.ToString("N2") -
+                                        Total Deductions: R @Model.TotalDeductions.ToString("N2")
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-between">
+                                <a asp-action="Index" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Back to List
+                                </a>
+                                <a asp-action="GeneratePayslip" asp-route-id="@Model.Id" class="btn btn-primary">
+                                    <i class="fas fa-download me-1"></i> Download Payslip
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card {
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            border: 1px solid #e3e6f0;
+        }
+
+        .card-header {
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        dt {
+            font-weight: 600;
+            color: #6e707e;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #6e707e;
+        }
+    </style>
+}

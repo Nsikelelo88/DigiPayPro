@@ -1,0 +1,69 @@
+﻿@model DigitalPayPro.ViewModels.PayrollProcessViewModel
+
+@{
+    ViewData["Title"] = "Process Payroll";
+}
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Process Payroll</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Process" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="EmployeeId" class="form-label"></label>
+                        <select asp-for="EmployeeId" asp-items="ViewBag.Employees" class="form-select">
+                            <option value="">-- Select Employee --</option>
+                        </select>
+                        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="PayPeriod" class="form-label"></label>
+                        <input asp-for="PayPeriod" class="form-control" type="month" />
+                        <span asp-validation-for="PayPeriod" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="OvertimeHours" class="form-label"></label>
+                        <input asp-for="OvertimeHours" class="form-control" type="number" step="0.5" min="0" />
+                        <span asp-validation-for="OvertimeHours" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Incentives" class="form-label"></label>
+                        <input asp-for="Incentives" class="form-control" type="number" step="0.01" min="0" />
+                        <span asp-validation-for="Incentives" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <button type="submit" class="btn btn-primary w-100">Process Payroll</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Set default pay period to current month
+            var now = new Date();
+            var month = (now.getMonth() + 1).toString().padStart(2, '0');
+            var year = now.getFullYear();
+            $('#PayPeriod').val(year + '-' + month);
+        });
+    </script>
+}

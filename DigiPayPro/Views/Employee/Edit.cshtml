@@ -1,0 +1,120 @@
+﻿@model DigitalPayPro.ViewModels.EmployeeViewModel
+
+@{
+    ViewData["Title"] = "Edit Employee";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-user-edit me-2"></i>
+                    Edit Employee
+                </h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Edit" method="post">
+                    <input type="hidden" asp-for="Id" />
+                    
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="FirstName" class="form-label"></label>
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="LastName" class="form-label"></label>
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="IDNumber" class="form-label"></label>
+                        <input asp-for="IDNumber" class="form-control" />
+                        <span asp-validation-for="IDNumber" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="Position" class="form-label"></label>
+                        <input asp-for="Position" class="form-control" />
+                        <span asp-validation-for="Position" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="BasicSalary" class="form-label"></label>
+                        <input asp-for="BasicSalary" class="form-control" />
+                        <span asp-validation-for="BasicSalary" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="BankName" class="form-label"></label>
+                        <input asp-for="BankName" class="form-control" />
+                        <span asp-validation-for="BankName" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="AccountNumber" class="form-label"></label>
+                        <input asp-for="AccountNumber" class="form-control" />
+                        <span asp-validation-for="AccountNumber" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="BranchCode" class="form-label"></label>
+                        <input asp-for="BranchCode" class="form-control" />
+                        <span asp-validation-for="BranchCode" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3 form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label"></label>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="DateJoined" class="form-label"></label>
+                        <input asp-for="DateJoined" class="form-control" />
+                        <span asp-validation-for="DateJoined" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Add any custom JavaScript validation if needed
+        $(document).ready(function() {
+            // Example: Format date input
+            $('#DateJoined').attr('type', 'date');
+        });
+    </script>
+}

@@ -1,0 +1,181 @@
+﻿@model DigitalPayPro.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title">Employees</h5>
+                        <h2 class="card-text">@Model.TotalEmployees</h2>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title">Active Employees</h5>
+                        <h2 class="card-text">@Model.ActiveEmployees</h2>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-user-check fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title">Monthly Payroll</h5>
+                        <h2 class="card-text">R @Model.TotalPayrollThisMonth.ToString("N2")</h2>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-money-bill-wave fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1">
+                        <h5 class="card-title">Pending Requests</h5>
+                        <h2 class="card-text">@(Model.PendingLeaveRequests + Model.PendingOvertimeRequests)</h2>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Payrolls</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentPayrolls.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Period</th>
+                                    <th class="text-end">Net Pay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var payroll in Model.RecentPayrolls)
+                                {
+                                    <tr>
+                                        <td>@payroll.Employee.FirstName @payroll.Employee.LastName</td>
+                                        <td>@payroll.PayPeriod.ToString("MMM yyyy")</td>
+                                        <td class="text-end">R @payroll.NetPay.ToString("N2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <a asp-controller="Payroll" asp-action="Index" class="btn btn-sm btn-outline-primary">View All</a>
+                }
+                else
+                {
+                    <p class="text-muted">No recent payroll records found.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Leave Requests</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentLeaveRequests.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Dates</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var leave in Model.RecentLeaveRequests)
+                                {
+                                    <tr>
+                                        <td>@leave.Employee.FirstName @leave.Employee.LastName</td>
+                                        <td>@leave.StartDate.ToString("dd MMM") - @leave.EndDate.ToString("dd MMM")</td>
+                                        <td>
+                                            <span class="badge bg-@(leave.Status == "Approved" ? "success" : leave.Status == "Rejected" ? "danger" : "warning")">
+                                                @leave.Status
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <a asp-controller="Leave" asp-action="Index" class="btn btn-sm btn-outline-primary">View All</a>
+                }
+                else
+                {
+                    <p class="text-muted">No recent leave requests found.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2 d-md-flex">
+                    <a asp-controller="Payroll" asp-action="Process" class="btn btn-primary me-md-2">
+                        <i class="fas fa-calculator me-1"></i> Process Payroll
+                    </a>
+                    <a asp-controller="Employee" asp-action="Create" class="btn btn-success me-md-2">
+                        <i class="fas fa-user-plus me-1"></i> Add Employee
+                    </a>
+                    <a asp-controller="Leave" asp-action="Create" class="btn btn-info me-md-2">
+                        <i class="fas fa-calendar-plus me-1"></i> Request Leave
+                    </a>
+                    <a asp-controller="Overtime" asp-action="Create" class="btn btn-warning">
+                        <i class="fas fa-clock me-1"></i> Request Overtime
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

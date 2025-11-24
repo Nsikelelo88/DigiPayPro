@@ -1,0 +1,74 @@
+﻿@model IEnumerable<DigitalPayPro.Models.LeaveRequest>
+
+@{
+    ViewData["Title"] = "Leave Requests";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-warning">@TempData["WarningMessage"]</div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Leave Type</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+            <th>Date Requested</th>
+            @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+            {
+                <th>Actions</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.Employee.FirstName @request.Employee.LastName</td>
+                <td>@request.LeaveType</td>
+                <td>@request.StartDate.ToString("yyyy-MM-dd")</td>
+                <td>@request.EndDate.ToString("yyyy-MM-dd")</td>
+                <td>@request.Status</td>
+                <td>@request.DateRequested.ToString("yyyy-MM-dd")</td>
+                @if (User.IsInRole("Admin") || User.IsInRole("HR"))
+                {
+                    <td>
+                        @if (request.Status == "Pending")
+                        {
+                            <form asp-action="Approve" method="post" style="display:inline">
+                                <input type="hidden" name="id" value="@request.Id" />
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form asp-action="Reject" method="post" style="display:inline">
+                                <input type="hidden" name="id" value="@request.Id" />
+                                <input type="text" name="reviewNotes" placeholder="Notes" required />
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span>N/A</span>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-primary">New Leave Request</a>
