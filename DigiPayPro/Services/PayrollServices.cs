@@ -68,7 +68,7 @@ namespace DigitalPayPro.Services
         }
 
         // Calculates the monthly PAYE (tax) based on South African tax brackets
-        public async Task<decimal> CalculatePAYE(decimal taxableIncome)
+        public Task<decimal> CalculatePAYE(decimal taxableIncome)
         {
             // SARS tax calculation for 2024/2025
             decimal annualIncome = taxableIncome * 12;
@@ -103,15 +103,16 @@ namespace DigitalPayPro.Services
                 tax = 644489 + (annualIncome - 1817000) * 0.45m;
             }
 
-            return tax / 12; // Return monthly tax amount
+            return Task.FromResult(tax / 12); // Return monthly tax amount
         }
 
         // Calculates the UIF deduction (1% of gross pay, capped at R177.12)
-        public async Task<decimal> CalculateUIF(decimal grossPay)
+        public Task<decimal> CalculateUIF(decimal grossPay)
         {
             // UIF is 1% of gross pay, capped at R177.12
             decimal uif = grossPay * 0.01m;
-            return uif > 177.12m ? 177.12m : uif;
+            decimal result = uif > 177.12m ? 177.12m : uif;
+            return Task.FromResult(result);
         }
 
         // Retrieves payroll history for a specific employee, ordered by most recent pay period

@@ -1,0 +1,47 @@
+@{
+    // Renders TempData-based flash messages: Success, Error, Warning, Info
+    var success = TempData["Success"] as string;
+    var error = TempData["Error"] as string;
+    var warning = TempData["Warning"] as string;
+    var info = TempData["Info"] as string;
+}
+
+@if (!string.IsNullOrEmpty(success))
+{
+    <div class="container mt-3">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @Html.Raw(Html.Encode(success))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="container mt-3">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @Html.Raw(Html.Encode(error))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(warning))
+{
+    <div class="container mt-3">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @Html.Raw(Html.Encode(warning))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(info))
+{
+    <div class="container mt-3">
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @Html.Raw(Html.Encode(info))
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}

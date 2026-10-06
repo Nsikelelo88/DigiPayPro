@@ -5,6 +5,7 @@
 }
 
 <div class="container mt-4">
+    @await Html.PartialAsync("_Flash")
     <div class="row">
         <div class="col-md-12">
             <div class="card">
@@ -132,7 +133,26 @@
                         <div class="col-md-12">
                             <div class="card bg-light">
                                 <div class="card-body text-center">
-                                    <h4 class="card-title">Net Pay: R @Model.NetPay.ToString("N2")</h4>
+                                    <h4 class="card-title">Summary</h4>
+                                    <p class="lead">Net Pay: <strong>R @Model.NetPay.ToString("N2")</strong></p>
+                                    <div class="d-flex justify-content-center">
+                                        <a asp-action="PreviewPayslip" asp-route-id="@Model.Id" target="_blank" class="btn btn-outline-primary me-2">
+                                            <i class="fas fa-eye me-1"></i>Preview Payslip
+                                        </a>
+                                        <a asp-action="GeneratePayslip" asp-route-id="@Model.Id" class="btn btn-primary me-2">
+                                            <i class="fas fa-file-pdf me-1"></i>Download Payslip (PDF)
+                                        </a>
+                                        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                                     <p class="card-text">
                                         Gross Pay: R @Model.GrossPay.ToString("N2") -
                                         Total Deductions: R @Model.TotalDeductions.ToString("N2")

@@ -1,6 +1,7 @@
 ﻿using DigitalPayPro.Data;
 using DigitalPayPro.Models;
 using DigitalPayPro.ViewModels;
+using DigitalPayPro.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,11 +14,13 @@ namespace DigitalPayPro.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<LeaveController> _logger;
+        private readonly ILeaveService _leaveService;
 
-        public LeaveController(ApplicationDbContext context, ILogger<LeaveController> logger)
+        public LeaveController(ApplicationDbContext context, ILogger<LeaveController> logger, ILeaveService leaveService)
         {
             _context = context;
             _logger = logger;
+            _leaveService = leaveService;
         }
 
         [HttpGet]
@@ -129,6 +132,14 @@ namespace DigitalPayPro.Controllers
                     if (model.StartDate < DateTime.Today)
                     {
                         ModelState.AddModelError("StartDate", "Start date cannot be in the past.");
+                        return View(model);
+                    }
+
+                    // Check for overlapping leave
+                    bool hasOverlap = await _leaveService.HasOverlappingLeaveAsync(model.EmployeeId, model.StartDate, model.EndDate);
+                    if (hasOverlap)
+                    {
+                        ModelState.AddModelError(string.Empty, "You already have an overlapping leave request for the selected dates.");
                         return View(model);
                     }
 

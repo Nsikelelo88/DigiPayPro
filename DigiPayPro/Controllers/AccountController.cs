@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using DigitalPayPro.Data;
 using DigitalPayPro.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
@@ -12,6 +13,8 @@ namespace DigitalPayPro.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<AccountController> _logger;
+        // Dummy bcrypt hash used to mitigate user enumeration timing attacks
+        private const string _dummyBcryptHash = "$2a$10$e0MYzXyjpJS7Pd0RVvHwHeFx4N6t8f0uZ1WvS1Qw7rjvWfWb4y6e.";
 
         // Constructor: Initializes the controller with database context and logger
         public AccountController(ApplicationDbContext context, ILogger<AccountController> logger)
@@ -22,6 +25,7 @@ namespace DigitalPayPro.Controllers
 
         // GET: Displays the login page
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl; // Store return URL for redirect after login
@@ -30,6 +34,8 @@ namespace DigitalPayPro.Controllers
 
         // POST: Handles user login
         [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl; // Store return URL
@@ -41,9 +47,21 @@ namespace DigitalPayPro.Controllers
                     // Find user by username
                     var user = await _context.Users
                         .FirstOrDefaultAsync(u => u.Username == model.Username);
+                    bool isValid = false;
+
+                    // Verify password (use dummy verify when user not found to mitigate timing attacks)
+                    if (user != null)
+                    {
+                        isValid = BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash);
+                    }
+                    else
+                    {
+                        // Run a dummy verify to make the response time similar whether the user exists or not
+                        BCrypt.Net.BCrypt.Verify(model.Password, _dummyBcryptHash);
+                    }
 
                     // If user exists and password is correct
-                    if (user != null && BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
+                    if (isValid && user != null)
                     {
                         // Create authentication claims
                         var claims = new List<Claim>
@@ -76,6 +94,9 @@ namespace DigitalPayPro.Controllers
 
                         _logger.LogInformation("User {Username} logged in at {Time}", user.Username, DateTime.UtcNow);
 
+                        // Set a success flash message
+                        TempData["Success"] = $"Welcome back, {user.FirstName}";
+
                         // Redirect to return URL if valid, otherwise home page
                         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                         {
@@ -86,6 +107,7 @@ namespace DigitalPayPro.Controllers
                     }
 
                     // Invalid login attempt
+                    TempData["Error"] = "Invalid username or password.";
                     ModelState.AddModelError(string.Empty, "Invalid login attempt");
                     _logger.LogWarning("Invalid login attempt for username: {Username}", model.Username);
                 }
@@ -93,6 +115,7 @@ namespace DigitalPayPro.Controllers
                 {
                     // Log error and show generic error message
                     _logger.LogError(ex, "Error during login for username: {Username}", model.Username);
+                    TempData["Error"] = "An error occurred during login. Please try again.";
                     ModelState.AddModelError(string.Empty, "An error occurred during login. Please try again.");
                 }
             }
@@ -103,10 +126,13 @@ namespace DigitalPayPro.Controllers
 
         // POST: Logs out the current user
         [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); // Sign out
             _logger.LogInformation("User logged out at {Time}", DateTime.UtcNow);
+            TempData["Success"] = "You have been logged out.";
             return RedirectToAction("Index", "Home"); // Redirect to home page
         }
 

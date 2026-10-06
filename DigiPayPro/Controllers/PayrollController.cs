@@ -47,6 +47,41 @@ namespace DigitalPayPro.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> PreviewPayslip(int id)
+        {
+            try
+            {
+                var payrollRecord = await _context.PayrollRecords
+                    .Include(pr => pr.Employee)
+                    .FirstOrDefaultAsync(pr => pr.Id == id);
+
+                if (payrollRecord == null)
+                {
+                    return NotFound();
+                }
+
+                var pdfBytes = await _pdfService.GeneratePayslipPdfAsync(payrollRecord);
+
+                var fileName = $"Payslip_{payrollRecord.Employee.LastName}_{payrollRecord.PayPeriod:yyyyMM}.pdf";
+
+                // Force inline display in browser
+                Response.Headers["Content-Disposition"] = $"inline; filename=\"{fileName}\"";
+
+                _logger.LogInformation("Payslip preview generated for employee {EmployeeName} for period {Period} by {User}",
+                    $"{payrollRecord.Employee.FirstName} {payrollRecord.Employee.LastName}",
+                    payrollRecord.PayPeriod.ToString("yyyy-MM"), User.Identity.Name);
+
+                return File(pdfBytes, "application/pdf");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating payslip preview for payroll ID {PayrollId}", id);
+                ViewBag.ErrorMessage = "An error occurred while generating the payslip preview.";
+                return RedirectToAction("Details", new { id });
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Process()
         {
             try
