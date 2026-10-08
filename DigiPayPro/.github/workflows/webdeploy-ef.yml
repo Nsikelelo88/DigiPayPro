@@ -1,0 +1,54 @@
+name: Web Deploy (MSDeploy) + EF Migrations
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore
+      run: dotnet restore DigiPayPro/DigiPayPro.csproj
+
+    - name: Build
+      run: dotnet build DigiPayPro/DigiPayPro.csproj --configuration Release --no-restore
+
+    - name: Prepare publish profile from secret
+      env:
+        PUBLISH_PROFILE: ${{ secrets.PUBLISH_PROFILE }}
+      shell: pwsh
+      run: |
+        if (-not (Test-Path "DigiPayPro/Properties/PublishProfiles")) { New-Item -ItemType Directory -Force -Path "DigiPayPro/Properties/PublishProfiles" | Out-Null }
+        if (-not $env:PUBLISH_PROFILE) { Write-Error "Missing secret PUBLISH_PROFILE. Add your .pubxml contents to the repository secret named PUBLISH_PROFILE."; exit 1 }
+        $env:PUBLISH_PROFILE | Out-File -Encoding utf8 -FilePath "DigiPayPro/Properties/PublishProfiles/monsterasp.pubxml"
+
+    - name: Publish (Web Deploy via msbuild)
+      shell: pwsh
+      run: |
+        dotnet msbuild DigiPayPro/DigiPayPro.csproj /p:DeployOnBuild=true /p:PublishProfile=monsterasp /p:Configuration=Release
+
+    - name: Run EF Core migrations (optional)
+      env:
+        ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTIONSTRING }}
+      shell: pwsh
+      run: |
+        if (-not $env:ConnectionStrings__DefaultConnection) {
+          Write-Output "No DB_CONNECTIONSTRING secret defined. Skipping EF migrations."; exit 0
+        }
+        dotnet tool install --global dotnet-ef --version 8.*
+        # Ensure tools path is available in this step
+        $env:PATH = "$env:USERPROFILE\\.dotnet\\tools;${env:PATH}"
+        dotnet ef database update --project DigiPayPro/DigiPayPro.csproj --startup-project DigiPayPro/DigiPayPro.csproj
+
+    - name: Done
+      run: Write-Output "Deployment steps finished."
