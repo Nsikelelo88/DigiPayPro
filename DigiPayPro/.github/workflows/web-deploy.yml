@@ -23,13 +23,8 @@ jobs:
     - name: Build
       run: dotnet build DigiPayPro/DigiPayPro.csproj --configuration Release --no-restore
 
-    - name: Prepare publish profile
-      env:
-        PUBLISH_PROFILE: ${{ secrets.PUBLISH_PROFILE }}
-      run: |
-        if (-not (Test-Path "DigiPayPro/Properties/PublishProfiles")) { New-Item -ItemType Directory -Force -Path "DigiPayPro/Properties/PublishProfiles" | Out-Null }
-        if (-not $env:PUBLISH_PROFILE) { Write-Error "Missing secret PUBLISH_PROFILE. Add your Web Deploy .pubxml contents to the repository secret named PUBLISH_PROFILE."; exit 1 }
-        $env:PUBLISH_PROFILE | Out-File -Encoding utf8 -FilePath "DigiPayPro/Properties/PublishProfiles/monsterasp.pubxml"
+    # Use a local publish profile at DigiPayPro/Properties/PublishProfiles/monsterasp.pubxml
+    # If you prefer secrets, revert to writing the profile from PUBLISH_PROFILE secret.
 
     - name: Publish (Web Deploy)
       run: |
