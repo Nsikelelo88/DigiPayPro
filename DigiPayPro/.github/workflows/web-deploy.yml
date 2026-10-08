@@ -1,0 +1,47 @@
+name: Build and Deploy to IIS (Web Deploy)
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore
+      run: dotnet restore DigiPayPro/DigiPayPro.csproj
+
+    - name: Build
+      run: dotnet build DigiPayPro/DigiPayPro.csproj --configuration Release --no-restore
+
+    - name: Prepare publish profile
+      env:
+        PUBLISH_PROFILE: ${{ secrets.PUBLISH_PROFILE }}
+      run: |
+        if (-not (Test-Path "DigiPayPro/Properties/PublishProfiles")) { New-Item -ItemType Directory -Force -Path "DigiPayPro/Properties/PublishProfiles" | Out-Null }
+        if (-not $env:PUBLISH_PROFILE) { Write-Error "Missing secret PUBLISH_PROFILE. Add your Web Deploy .pubxml contents to the repository secret named PUBLISH_PROFILE."; exit 1 }
+        $env:PUBLISH_PROFILE | Out-File -Encoding utf8 -FilePath "DigiPayPro/Properties/PublishProfiles/monsterasp.pubxml"
+
+    - name: Publish (Web Deploy)
+      run: |
+        dotnet msbuild DigiPayPro/DigiPayPro.csproj /p:DeployOnBuild=true /p:PublishProfile=monsterasp /p:Configuration=Release
+
+    - name: Run EF Core migrations
+      env:
+        ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTIONSTRING }}
+      run: |
+        if (-not $env:ConnectionStrings__DefaultConnection) { Write-Output "No DB connection string provided in secret DB_CONNECTIONSTRING. Skipping migrations."; exit 0 }
+        dotnet tool restore
+        dotnet ef database update --project DigiPayPro/DigiPayPro.csproj --startup-project DigiPayPro/DigiPayPro.csproj
+
+    - name: Done
+      run: Write-Output "Deployment finished."
