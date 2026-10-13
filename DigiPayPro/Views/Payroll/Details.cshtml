@@ -23,13 +23,20 @@
                             <hr>
                             <dl class="row">
                                 <dt class="col-sm-4">Employee Name:</dt>
-                                <dd class="col-sm-8">@Model.Employee.FirstName @Model.Employee.LastName</dd>
+                                @if (Model.Employee != null)
+                                {
+                                    <dd class="col-sm-8">@Model.Employee.FirstName @Model.Employee.LastName</dd>
 
-                                <dt class="col-sm-4">ID Number:</dt>
-                                <dd class="col-sm-8">@Model.Employee.IDNumber</dd>
+                                    <dt class="col-sm-4">ID Number:</dt>
+                                    <dd class="col-sm-8">@Model.Employee.IDNumber</dd>
 
-                                <dt class="col-sm-4">Position:</dt>
-                                <dd class="col-sm-8">@Model.Employee.Position</dd>
+                                    <dt class="col-sm-4">Position:</dt>
+                                    <dd class="col-sm-8">@Model.Employee.Position</dd>
+                                }
+                                else
+                                {
+                                    <dd class="col-sm-8 text-muted">Employee information not available</dd>
+                                }
                             </dl>
                         </div>
                         <div class="col-md-6">

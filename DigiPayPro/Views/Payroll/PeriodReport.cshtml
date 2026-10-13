@@ -1,0 +1,54 @@
+@model IEnumerable<DigitalPayPro.Models.PayrollRecord>
+@{
+    ViewData["Title"] = "Payroll Period Report";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Payroll Report for @((ViewBag.SelectedPeriod as DateTime?)?.ToString("MMMM yyyy") ?? "Selected Period")</h3>
+    <div>
+        <a asp-action="GeneratePeriodReport" asp-route-period="@((ViewBag.SelectedPeriod as DateTime?)?.ToString("yyyy-MM-dd"))" class="btn btn-primary">Download PDF</a>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Back to Payroll</a>
+    </div>
+</div>
+
+@if (ViewBag.InfoMessage != null)
+{
+    <div class="alert alert-info">@ViewBag.InfoMessage</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">No payroll records for the selected period.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>ID Number</th>
+                    <th>Position</th>
+                    <th>Pay Period</th>
+                    <th>Gross Pay</th>
+                    <th>Net Pay</th>
+                    <th>Date Processed</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var pr in Model)
+                {
+                    <tr>
+                        <td>@(pr.Employee != null ? pr.Employee.FullName : "(unknown)")</td>
+                        <td>@(pr.Employee?.IDNumber)</td>
+                        <td>@(pr.Employee?.Position)</td>
+                        <td>@pr.PayPeriod.ToString("MMMM yyyy")</td>
+                        <td>@pr.GrossPay.ToString("N2")</td>
+                        <td>@pr.NetPay.ToString("N2")</td>
+                        <td>@pr.DateProcessed.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

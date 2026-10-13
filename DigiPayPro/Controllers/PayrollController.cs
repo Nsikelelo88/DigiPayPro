@@ -163,6 +163,22 @@ namespace DigitalPayPro.Controllers
                         return NotFound();
                     }
 
+                    // If Employee navigation is null (deleted or missing), attempt to load the employee record
+                    if (payrollRecord.Employee == null)
+                    {
+                        try
+                        {
+                            var emp = await _context.Employees
+                                .FirstOrDefaultAsync(e => e.Id == payrollRecord.EmployeeId);
+
+                            payrollRecord.Employee = emp; // may be null; view handles null now
+                        }
+                        catch (Exception exEmp)
+                        {
+                            _logger.LogWarning(exEmp, "Failed to load employee for payroll ID {PayrollId}", id);
+                        }
+                    }
+
                     return View(payrollRecord);
                 }
                 catch (Exception ex)
