@@ -13,6 +13,8 @@
 }
 
 <form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
     <div class="form-group">
         @if (User.IsInRole("Admin") || User.IsInRole("HR"))
         {
