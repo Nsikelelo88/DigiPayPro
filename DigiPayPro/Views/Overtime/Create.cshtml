@@ -23,6 +23,8 @@
 }
 
 <form asp-action="Create" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+
     @if (User.IsInRole("Admin") || User.IsInRole("HR"))
     {
         <div class="mb-3">
@@ -38,6 +40,7 @@
         <div class="mb-3">
             <label class="form-label">Employee</label>
             <input class="form-control" value="@Model.EmployeeName" disabled />
+            <input type="hidden" asp-for="EmployeeId" />
         </div>
     }
 
